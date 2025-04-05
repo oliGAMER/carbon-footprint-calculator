@@ -5,5 +5,5 @@ using namespace std;
 
 int main()
 {
-    cout << "ooooooooo" << endl;
+    cout << "halaat kharab hogyi" << endl;
 }
