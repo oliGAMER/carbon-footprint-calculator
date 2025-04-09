@@ -7,9 +7,10 @@ private:
     double distance;
 
 public:
-    Transport(double dist);
+    Transport(double d);
+    ~Transport();
     double getDistance();
     double calculateEmission();
-
+    void setDistance(double d);
     void display();
 };
