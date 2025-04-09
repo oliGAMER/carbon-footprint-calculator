@@ -1,11 +1,15 @@
 #include "..\headers\transport.hpp"
 #include <iostream>
 
-Transport::Transport(double dist) : distance(dist) {}
+Transport::Transport(double d) : distance(d) {}
 
 double Transport::getDistance()
 {
     return distance;
+}
+void Transport::setDistance(double d)
+{
+    distance = d;
 }
 
 double Transport::calculateEmission()
@@ -18,4 +22,7 @@ void Transport::display()
 {
     std::cout << "Transport Distance: " << distance << " km" << std::endl;
     std::cout << "CO2 Emission: " << calculateEmission() << " kg" << std::endl;
+}
+Transport::~Transport()
+{
 }

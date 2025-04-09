@@ -2,37 +2,67 @@
 #include <fstream>
 #include "..\headers\user.hpp"
 
-User::User(std::string n, std::string loc)
-    : name(n), location(loc), transport(0), food(0), electricity(0) {}
+#include "..\headers\activity.hpp"
 
-void User ::setEmissions(double t, double f, double e)
+User::User(std::string name, std::string location)
+    : transport(0.0), food(0.0), electricity(0.0), totalCarbonFootprint(0.0),
+      name(name), location(location) {}
+
+
+      User::User(std::string name, std::string location, double foodConsumption, double electricityConsumption, double transportDistance)
+      : transport(transportDistance), food(foodConsumption), electricity(electricityConsumption),
+        totalCarbonFootprint(0.0), name(name), location(location) {}
+  
+
+void User::setTransportData(double distance)
 {
-    transport = t;
-    food = f;
-    electricity = e;
+    transport.setDistance(distance);
 }
 
-double User::getTotalEmission() const
+void User::setFoodData(double weeklyConsumption)
 {
-    return transport + food + electricity;
+    food.setWeeklyConsumption(weeklyConsumption);
+}
+
+void User::setElectricityData(double monthlyKwh)
+{
+    electricity.setMonthlyUsage(monthlyKwh);
+}
+
+void User::calculateCarbonFootprint()
+{
+    totalCarbonFootprint =
+        transport.calculateEmission() +
+        food.calculateEmission() +
+        electricity.calculateEmission();
+}
+
+double User::getTotalCarbonFootprint() const
+{
+    return totalCarbonFootprint;
 }
 
 void User::display() const
 {
-    std::cout << "Name: " << name << "\nLocation: " << location
-              << "\nTransport: " << transport << "\nFood: " << food
-              << "\nElectricity: " << electricity
-              << "\nTotal CO2 Emission: " << getTotalEmission() << " kg CO2\n";
+    std::cout << "User: " << name << ", Location: " << location << "\n";
+    std::cout << "Total Carbon Footprint: " << totalCarbonFootprint << " kg CO2\n";
 }
 
 void User::saveToCSV(const std::string &filename) const
 {
-    std::ofstream outFile(filename, std::ios::app);
-    if (outFile.tellp() == 0)
+    std::ofstream file(filename, std::ios::app);
+    if (file.is_open())
     {
-        outFile << "Name,Location,Transport,Food,Electricity,TotalEmission\n";
+        file << name << "," << location << "," << totalCarbonFootprint << "\n";
+        file.close();
     }
-    outFile << name << "," << location << "," << transport << "," << food << ","
-            << electricity << "," << getTotalEmission() << "\n";
-    outFile.close();
 }
+
+void User::setEmission(double transportEmissions, double foodEmissions, double electricityEmissions)
+{
+    transport.setDistance(transportEmissions);
+    food.setWeeklyConsumption(foodEmissions);
+    electricity.setMonthlyUsage(electricityEmissions);
+    totalCarbonFootprint = food.getWeeklyConsumption() + electricity.getMonthlyUsage() + transport.getDistance();
+}
+User::~User(){}
