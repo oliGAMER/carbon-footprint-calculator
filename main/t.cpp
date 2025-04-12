@@ -4,10 +4,12 @@
 #include "..\headers\transport.hpp"
 #include "..\headers\food.hpp"
 #include "..\headers\electricity.hpp"
-//#include "../headers/carbon_calculator.hpp"
+// #include "../headers/carbon_calculator.hpp"
 
 int main()
 {
+    // system("start map.html");
+
     std::string name, location;
 
     std::cout << "Enter your name: ";
