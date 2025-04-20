@@ -4,11 +4,17 @@
 #include "..\headers\transport.hpp"
 #include "..\headers\food.hpp"
 #include "..\headers\electricity.hpp"
+#include "..\headers\GeoEncoder.hpp"  // Add this line
+#include <fstream>
+#include <limits> 
+#include <thread>
+#include <chrono>
+
 // #include "../headers/carbon_calculator.hpp"
 
 int main()
 {
-    // system("start map.html");
+    //system("start map.html");
 
     std::string name, location;
 
@@ -35,6 +41,7 @@ int main()
         std::cout << "4. View Total Carbon Footprint\n";
         std::cout << "5. Save Data to CSV\n";
         std::cout << "6. Exit\n";
+        std::cout << "7. Enter your location\n";  // Add this line
         std::cout << "Choose an option: ";
         std::cin >> option;
 
@@ -85,10 +92,77 @@ int main()
             std::cout << "Data saved to " << filename << "\n";
             break;
         }
-        case 6:
-            running = false;
+        case 6:{
+            running = false; // to end the program
             std::cout << "Exiting the program.\n";
             break;
+        }
+
+        case 7: {
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Clear input buffer
+            bool locationConfirmed = false;
+
+            while(!locationConfirmed){
+                std::string area, city, country;
+                std::cout << "Enter country (e.g., Pakistan): ";
+                std::getline(std::cin, country);
+                std::cout << "Enter city (e.g., Karachi): ";
+                std::getline(std::cin, city);
+                std::cout << "Enter area (e.g., Gulshan-e-Iqbal): ";
+                std::getline(std::cin, area);
+
+                GeoEncoder encoder;
+                auto coordinates = encoder.getCoordinates(area, city, country);
+
+                if (coordinates.isValid) {
+
+                    std::ofstream jsFile("user_data.js");
+                    if (jsFile.is_open()) {
+                        jsFile << "var userData = {\n";
+                        jsFile << "  name: \"" << name << "\",\n";
+                        jsFile << "  location: [" << coordinates.latitude << ", " << coordinates.longitude << "],\n";
+                        jsFile << "};\n";
+                        jsFile.close();
+                    }
+
+                    std::cout << "\nGenerating the map. Please wait...\n";
+                    std::cout << "You have to verify the location and type your response here.\n";
+                    std::this_thread::sleep_for(std::chrono::seconds(7)); 
+
+                    system("start map.html");
+
+                    char confirm;
+                    std::cout << "\nIs this location correct? (y/n): ";
+                    std::cin >> confirm;
+            
+                    if (confirm == 'y' || confirm == 'Y') {
+                        std::cout << "Location confirmed.\n";
+                        locationConfirmed = true;
+
+
+                    } else {
+                        std::cout << "Let's try again.\n";
+                        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                    }
+
+                } else {
+                    std::cout << "\nLocation verification failed!\n";
+                    std::cout << "Error: " << coordinates.message << "\n";
+
+                    char tryAgain;
+                    std::cout << "Do you want to try a different location? (y/n): ";
+                    std::cin >> tryAgain;
+        
+                    if (tryAgain != 'y' && tryAgain != 'Y') {
+                        std::cout << "Skipping location verification.\n";
+                        break;
+                    }
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                }
+            }
+            break;
+        }
+
         default:
             std::cout << "Invalid option. Please try again.\n";
             break;
