@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carbon Footprint Red Zones</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+  <style>
+    body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+    #map { height: 100vh; width: 100vw; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script src="zone_data.js"></script>
+  <script>
+    const map = L.map('map').setView([30.3753, 69.3451], 5);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    zoneData.forEach(zone => {
+      const color = zone.isRedZone ? 'red' : 'green';
+      const fill = zone.isRedZone ? '#f03' : '#90ee90';
+
+      L.circle(zone.coords, {
+        color: color,
+        fillColor: fill,
+        fillOpacity: 0.5,
+        radius: 5000 + (zone.totalEmission * 10)
+      })
+      .addTo(map)
+      .bindPopup(`
+        <strong>${zone.name}</strong><br>
+        Total Emissions: ${zone.totalEmission.toFixed(2)} kg CO₂<br>
+        Status: ${zone.isRedZone ? '🔴 Red Zone' : '🟢 Safe'}
+      `);
+    });
+  </script>
+</body>
+</html>
