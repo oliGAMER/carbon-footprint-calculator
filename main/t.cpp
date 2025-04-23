@@ -217,7 +217,7 @@ int main()
 
             auto haversine = [](double lat1, double lon1, double lat2, double lon2)
             {
-                const double R = 6371000.0, toRad = M_PI / 180.0;
+                const double R = 6371000.0, toRad = acos(-1) / 180.0;
                 double dLat = (lat2 - lat1) * toRad, dLon = (lon2 - lon1) * toRad;
                 double a = sin(dLat / 2) * sin(dLat / 2) +
                            cos(lat1 * toRad) * cos(lat2 * toRad) * sin(dLon / 2) * sin(dLon / 2);
