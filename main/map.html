@@ -1,34 +1,69 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Carbon Footprint Map</title>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <title>Carbon Footprint Map</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+
+    <style>
+        body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        #map { width: 100vw; height: 100vh; display: none; }
+        #error { text-align: center; margin-top: 20px; font-size: 18px; color: red; }
+    </style>
 </head>
 <body>
-  <div id="map" style="width: 100vw; height: 100vh;"></div>
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script>
-    var map = L.map('map').setView([28.6139, 77.2090], 5); // Default: India
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-    }).addTo(map);
 
-   
- // Example: Red circle for high-emission zone
- L.circle([28.6139, 77.2090], {
-      color: 'red',
-      fillColor: '#f03',
-      fillOpacity: 0.5,
-      radius: 50000
-    }).addTo(map).bindPopup("High Emission Zone");
+    <h2>User Carbon Footprint Visualization</h2>
+    <div id="error">Loading map...</div>
+    <div id="map"></div>
 
-    // Example: Green marker for tree planting suggestion
-    L.marker([29.0, 77.5]).addTo(map).bindPopup("Suggested Tree Planting Area");
+    <!-- Load user data dynamically -->
+    <script src="user_data.js"></script>
 
+    <script>
+        // Check if userData is loaded from user_data.js
+        if (window.userData && userData.location) {
+            const [latitude, longitude] = userData.location;
+            const popupText = `
+                <strong>${userData.name}</strong><br>
+                Total Emissions: ${userData.emissions !== undefined ? userData.emissions.toFixed(2) + ' kg CO₂' : 'N/A'}
+            `;
 
+            // Hide error message and show the map
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('map').style.display = 'block';
 
-  </script>
+            // Initialize the map
+            const map = L.map('map').setView([latitude, longitude], 13);
+
+            // Add OpenStreetMap tiles
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Add a marker for the exact coordinates
+            L.marker([latitude, longitude])
+                .addTo(map)
+                .bindPopup(popupText)
+                .openPopup();
+
+            // Add a circle with a 5 km radius
+            L.circle([latitude, longitude], {
+                color: 'blue',
+                fillColor: '#add8e6',
+                fillOpacity: 0.5,
+                radius: 5000
+            }).addTo(map);
+        } else {
+            // Show error message if userData is not loaded
+            document.getElementById('error').textContent = "Unable to load map: User data is missing.";
+        }
+    </script>
+
 </body>
 </html>
