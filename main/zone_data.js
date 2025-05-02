@@ -28,5 +28,11 @@ var zoneData = [
     coords: [24.82, 67.07],
     totalEmission: 125.00,
     isRedZone: false
+  },
+  {
+    name: "sam (d, s, l)",
+    coords: [18.23, -73.28],
+    totalEmission: 0.00,
+    isRedZone: false
   }
 ];
