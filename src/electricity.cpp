@@ -1,4 +1,4 @@
-#include "..\headers\electricity.hpp"
+#include "../headers/electricity.hpp"
 
 Electricity::Electricity(double d = 0.0) : Usage(d) {}
 
