@@ -1,8 +1,8 @@
 #include <iostream>
 #include <fstream>
-#include "..\headers\user.hpp"
+#include "../headers/user.hpp"
 
-#include "..\headers\activity.hpp"
+#include "../headers/activity.hpp"
 
 User::User(std::string name, std::string location)
     : transport(0.0), food(0.0), electricity(0.0), totalCarbonFootprint(0.0),
@@ -53,7 +53,8 @@ void User::saveToCSV(const std::string &filename) const
     std::ofstream file(filename, std::ios::app);
     if (file.is_open())
     {
-        file << name << "," << location << "," << totalCarbonFootprint << "\n";
+        file << name << ",\"" << location << "\"," << totalCarbonFootprint << "\n";
+
         file.close();
     }
 }

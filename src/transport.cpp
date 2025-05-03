@@ -1,4 +1,4 @@
-#include "..\headers\transport.hpp"
+#include "../headers/transport.hpp"
 #include <iostream>
 
 Transport::Transport(double d) : distance(d) {}

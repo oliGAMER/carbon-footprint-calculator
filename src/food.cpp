@@ -1,4 +1,4 @@
-#include "..\headers\food.hpp"
+#include "../headers/food.hpp"
 
 Food::Food(double d) : weeklyConsumptionKg(d) {}
 

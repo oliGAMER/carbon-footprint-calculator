@@ -1,5 +1,5 @@
 // csv_reader.cpp
-#include "..\headers\csv_reader.hpp"
+#include "../headers/csv_reader.hpp"
 #include <fstream>
 #include <sstream>
 #include <iostream>
