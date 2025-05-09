@@ -1,6 +1,8 @@
 #include "../headers/geoencoder.hpp"
 #include <curl/curl.h>
+//for string formatting, such as the ostringstream stuff
 #include <sstream>
+//provides formatting manipulators for input/output operations
 #include <iomanip>
 #include <iostream>
 
