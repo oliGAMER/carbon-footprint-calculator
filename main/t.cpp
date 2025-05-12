@@ -5,6 +5,8 @@
 #include "../headers/electricity.hpp"
 #include "../headers/GeoEncoder.hpp"
 #include "../headers/csv_reader.hpp"
+#include "../headers/statistics.hpp"
+#include "../headers/emission_classifier.hpp"
 #include <fstream>
 #include <limits>
 #include <thread>
@@ -35,7 +37,8 @@ double getValidatedNumericInput(const std::string& prompt) {
         }
     }
 }
-
+//without typedef full type declaration everytime
+typedef double (Statistics::*StatOperation)(); 
 int main()
 {
     std::string name,location,country,city,area;
@@ -118,6 +121,8 @@ int main()
         std::cout << "6. Exit\n";
         std::cout << "7. Confirm your location from the map\n";
         std::cout << "8. Generate Red Zone Map\n";
+        std::cout << "9. Statistics\n";
+        std::cout << "-----------------------------------\n";
         std::cout << "Choose an option: ";
 
         while (true)
@@ -377,6 +382,43 @@ int main()
             js.close();
             std::cout << "Red zone map generated. Opening map...\n";
             system("start map_red_zones.html");
+            break;
+        }
+        case 9:
+        {
+            EmissionClassifier<double> classifier(0.0, 500.0);
+            double total = transportEmissions + foodEmissions + electricityEmissions;
+            std::cout << std::endl;
+            std::cout << "Emission Classification: ";
+            classifier(total);
+            std::cout << std::endl;
+            std::vector<CSVUserRecord> records = CSVReader::readZones("user_data.csv");
+            Statistics stats(records);
+            StatOperation operations[] = {
+                &Statistics::calculateMean,
+                &Statistics::calculateMedian,
+                &Statistics::calculateStandardDeviation,
+                &Statistics::calculateVariance,
+                &Statistics::calculateIQR
+            };
+            
+            // Define corresponding names
+            const char* names[] = {
+                "Mean",
+                "Median",
+                "Standard Deviation",
+                "Variance",
+                "IQR"
+            };
+
+            std::cout <<"\nStatiscal Analysis\n";
+            std::cout << "-------------------\n";
+
+            for(size_t i = 0; i < 5; ++i) {
+            double result = (stats.*operations[i])();
+            std::cout << std::setw(20) << std::left << names[i] 
+                 << ": " << std::fixed << std::setprecision(2) << result << "\n";
+            }
             break;
         }
 
