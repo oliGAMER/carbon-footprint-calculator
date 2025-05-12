@@ -5,6 +5,8 @@
 #include "../headers/electricity.hpp"
 #include "../headers/GeoEncoder.hpp"
 #include "../headers/csv_reader.hpp"
+#include "../headers/statistics.hpp"
+#include "../headers/emission_classifier.hpp"
 #include <fstream>
 #include <limits>
 #include <thread>
@@ -35,7 +37,8 @@ double getValidatedNumericInput(const std::string& prompt) {
         }
     }
 }
-
+//without typedef full type declaration everytime
+typedef double (Statistics::*StatOperation)(); 
 int main()
 {
     std::string name,location,country,city,area;
@@ -86,7 +89,7 @@ int main()
         if (coordinates.isValid)
             break;
 
-        std::cout << "Invalid location: " << coordinates.message << "\nPlease try again.\n";
+        std::cout << coordinates.message << "\nPlease try again.\n";
 
     } while (true);
 
@@ -116,8 +119,10 @@ int main()
         std::cout << "4. View Total Carbon Footprint\n";
         std::cout << "5. Save Data to CSV\n";
         std::cout << "6. Exit\n";
-        std::cout << "7. Enter your location\n";
+        std::cout << "7. Confirm your location from the map\n";
         std::cout << "8. Generate Red Zone Map\n";
+        std::cout << "9. Statistics\n";
+        std::cout << "-----------------------------------\n";
         std::cout << "Choose an option: ";
 
         while (true)
@@ -182,23 +187,20 @@ int main()
             running = false;
             break;
 
-        case 7:
+    case 7:
+    {
+        if (!hasSavedData)
         {
-            if (!hasSavedData)
-            {
-                std::cout << "Please save data first using option 5.\n";
-                break;
-            }
+            std::cout << "Please save data first using option 5.\n";
+            break;
+        }
 
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            bool confirmed = false;
-
-            while (!confirmed)
-            {
-                std::string area, city, country;
-                while (true) {
+        bool confirmed = false;
+        while (!confirmed)
+        {
+            std::string area, city, country;
+            while (true) {
                 std::cout << "Enter country: ";
-                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); 
                 std::getline(std::cin, country);
                 if (country.empty()) {
                     std::cout << "Country cannot be empty. Please try again.\n";
@@ -218,48 +220,59 @@ int main()
                     std::cout << "Area cannot be empty. Please try again.\n";
                     continue;
                 }
-            
-                // If all inputs are valid, break out of the loop
                 break;
             }
-                
-                std::string fullLocation = area + ", " + city + ", " + country;
-                GeoEncoder encoder;
-                auto coordinates = encoder.getCoordinates(area, city, country);
-                if (coordinates.isValid)
+            
+            std::string fullLocation = area + ", " + city + ", " + country;
+            GeoEncoder encoder;
+            auto coordinates = encoder.getCoordinates(area, city, country);
+            
+            if (coordinates.isValid)
+            {
+                double totalEmissions = transportEmissions + foodEmissions + electricityEmissions;
+                std::ofstream js("user_data.js");
+                js << "var userData = {\n";
+                js << "  name: \"" << name << "\",\n";
+                js << "  location: [" << coordinates.latitude << ", " << coordinates.longitude << "],\n";
+                js << "  locationText: \"" << fullLocation << "\",\n"; 
+                js << "  totalEmissions: " << totalEmissions << "\n";
+                js << "};\n";
+                js.close();
+
+                std::cout << "Opening map...\n";
+                std::this_thread::sleep_for(std::chrono::seconds(4));
+                system("start map.html");
+
+                std::cout << "Is location correct? (y/n): ";
+                char check;
+                std::cin >> check;
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+                if (check == 'y' || check == 'Y')
                 {
-                    std::ofstream js("user_data.js");
-                    js << "var userData = {\n";
-                    js << "  name: \"" << name << "\",\n";
-                    js << "  location: [" << coordinates.latitude << ", " << coordinates.longitude << "],\n";
-                    js << "  locationText: \"" << fullLocation << "\"\n";
-                    js << "};\n";
-                    js.close();
-
-                    std::cout << "Opening map...\n";
-                    std::this_thread::sleep_for(std::chrono::seconds(4));
-                    system("map.html");
-
-                    char check;
-                    std::cout << "Is location correct? (y/n): ";
-                    std::cin >> check;
-                    if (check == 'y' || check == 'Y')
-                    {
-                        confirmed = true;
-                    }
+                    confirmed = true;
+                    std::cout << "Location updated successfully.\n";
                 }
-                else
-                {
-                    std::cout << "Location failed: " << coordinates.message << "\n";
-                    char retry;
-                    std::cout << "Retry? (y/n): ";
-                    std::cin >> retry;
-                    if (retry != 'y' && retry != 'Y')
-                        break;
+
+                else{
+                    std::cout << "Location not confirmed. Please try again.\n";
                 }
             }
-            break;
+            else
+            {
+                std::cout << "Location failed: " << coordinates.message << "\n";
+                std::cout << "Retry? (y/n): ";
+                char retry;
+                std::cin >> retry;
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                
+                if (retry != 'y' && retry != 'Y')
+                    break;
+                
+            }
         }
+        break;
+    }
 
         case 8:
         {
@@ -369,6 +382,43 @@ int main()
             js.close();
             std::cout << "Red zone map generated. Opening map...\n";
             system("start map_red_zones.html");
+            break;
+        }
+        case 9:
+        {
+            EmissionClassifier<double> classifier(0.0, 500.0);
+            double total = transportEmissions + foodEmissions + electricityEmissions;
+            std::cout << std::endl;
+            std::cout << "Emission Classification: ";
+            classifier(total);
+            std::cout << std::endl;
+            std::vector<CSVUserRecord> records = CSVReader::readZones("user_data.csv");
+            Statistics stats(records);
+            StatOperation operations[] = {
+                &Statistics::calculateMean,
+                &Statistics::calculateMedian,
+                &Statistics::calculateStandardDeviation,
+                &Statistics::calculateVariance,
+                &Statistics::calculateIQR
+            };
+            
+            // Define corresponding names
+            const char* names[] = {
+                "Mean",
+                "Median",
+                "Standard Deviation",
+                "Variance",
+                "IQR"
+            };
+
+            std::cout <<"\nStatiscal Analysis\n";
+            std::cout << "-------------------\n";
+
+            for(size_t i = 0; i < 5; ++i) {
+            double result = (stats.*operations[i])();
+            std::cout << std::setw(20) << std::left << names[i] 
+                 << ": " << std::fixed << std::setprecision(2) << result << "\n";
+            }
             break;
         }
 
