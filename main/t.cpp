@@ -38,7 +38,7 @@ double getValidatedNumericInput(const std::string& prompt) {
     }
 }
 //without typedef full type declaration everytime
-typedef double (Statistics::*StatOperation)(); 
+using StatOperation = double (Statistics::*)();
 int main()
 {
     std::string name,location,country,city,area;
