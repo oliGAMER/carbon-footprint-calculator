@@ -50,9 +50,7 @@ This C++ application calculates an individual's carbon footprint based on their 
 │   └── user.hpp
 ├── main/
 │   ├── .gitkeep
-│   ├── lib.cpp
-│   ├── main.cpp                    // Application entry point and CLI logic
-│   └── t.cpp
+│   └── t.cpp (main.cpp)
 └── src/
     ├── .gitkeep
     ├── csv_reader.cpp
@@ -63,8 +61,8 @@ This C++ application calculates an individual's carbon footprint based on their 
     ├── transport.cpp
     └── user.cpp
 
-*(Note: `user_data.csv`, `user_data.js`, `zone_data.js`, `map.html`, and `map_red_zones.html` are generated/used by the application and typically appear in the directory from which the executable is run, or in the `build` directory alongside the executable as shown).*
-
+*(Important: While `user_data.csv`, `user_data.js` and `zone_data.js` are automatically generated, you must manually copy `map.html` and `map_red_zones.html` to your build/working directory for the mapping functionality to work properly. These HTML files should be placed in the same directory as the executable.)*
+```
 ## Prerequisites
 - A C++ compiler supporting C++17 (e.g., GCC, Clang, MSVC).
 - CMake (version 3.10 or higher).
