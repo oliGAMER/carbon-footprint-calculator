@@ -26,41 +26,42 @@ This C++ application calculates an individual's carbon footprint based on their 
 - HTML/JavaScript: For map visualizations (requires a modern web browser).
 
 ## Directory Structure
-Markdown
+
+```text
 .
-├── CMakeLists.txt // Main CMake configuration file
-├── build/ // Build output directory
-│ ├── CarbonFootprintCalculator.exe // The compiled executable
-│ ├── map.html // HTML file for single user location map
-│ ├── map_red_zones.html // HTML file for red zone emission map
-│ ├── user_data.csv // Stores user emission data
-│ ├── user_data.js // JavaScript data for map.html
-│ └── zone_data.js // JavaScript data for map_red_zones.html
+├── CMakeLists.txt                  // Main CMake configuration file
+├── build/                          // Build output directory
+│   ├── CarbonFootprintCalculator.exe // The compiled executable
+│   ├── map.html                      // HTML file for single user location map
+│   ├── map_red_zones.html            // HTML file for red zone emission map
+│   ├── user_data.csv                 // Stores user emission data
+│   ├── user_data.js                  // JavaScript data for map.html
+│   └── zone_data.js                  // JavaScript data for map_red_zones.html
 ├── headers/
-│ ├── .gitkeep
-│ ├── activity.hpp
-│ ├── csv_reader.hpp
-│ ├── electricity.hpp
-│ ├── emission_classifier.hpp
-│ ├── food.hpp
-│ ├── GeoEncoder.hpp
-│ ├── statistics.hpp
-│ ├── transport.hpp
-│ └── user.hpp
+│   ├── .gitkeep
+│   ├── activity.hpp
+│   ├── csv_reader.hpp
+│   ├── electricity.hpp
+│   ├── emission_classifier.hpp
+│   ├── food.hpp
+│   ├── GeoEncoder.hpp
+│   ├── statistics.hpp
+│   ├── transport.hpp
+│   └── user.hpp
 ├── main/
-│ ├── .gitkeep
-│ ├── lib.cpp
-│ ├── main.cpp // Application entry point and CLI logic
-│ └── t.cpp
+│   ├── .gitkeep
+│   ├── lib.cpp
+│   ├── main.cpp                    // Application entry point and CLI logic
+│   └── t.cpp
 └── src/
-├── .gitkeep
-├── csv_reader.cpp
-├── electricity.cpp
-├── food.cpp
-├── GeoEncoder.cpp
-├── statistics.cpp
-├── transport.cpp
-└── user.cpp
+    ├── .gitkeep
+    ├── csv_reader.cpp
+    ├── electricity.cpp
+    ├── food.cpp
+    ├── GeoEncoder.cpp
+    ├── statistics.cpp
+    ├── transport.cpp
+    └── user.cpp
 
 *(Note: `user_data.csv`, `user_data.js`, `zone_data.js`, `map.html`, and `map_red_zones.html` are generated/used by the application and typically appear in the directory from which the executable is run, or in the `build` directory alongside the executable as shown).*
 
