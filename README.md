@@ -112,4 +112,4 @@ This C++ application calculates an individual's carbon footprint based on their 
 ## Notes
 - The `map.html` and `map_red_zones.html` files use Leaflet.js and OpenStreetMap tiles for mapping. An internet connection is required for the maps to load correctly in your browser.
 - Ensure you save your data (Option 5) before attempting to generate maps for the current session's user (Option 7). Option 8 always reads from the existing `user_data.csv`.
-- The files `lib.cpp` and `t.cpp` in the `main/` directory are part of the project structure; their specific roles should be detailed if they contain significant logic.
+
